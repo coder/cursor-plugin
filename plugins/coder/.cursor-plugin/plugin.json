@@ -1,0 +1,40 @@
+{
+  "name": "coder",
+  "displayName": "Coder",
+  "version": "0.0.1",
+  "description": "Connect Cursor to your self-hosted Coder deployment. Manage workspaces, templates, and Coder Agents through the Coder MCP server, and use skills to install, configure, and operate Coder.",
+  "author": {
+    "name": "Coder",
+    "email": "support@coder.com",
+    "url": "https://coder.com"
+  },
+  "homepage": "https://coder.com",
+  "repository": "https://github.com/coder/cursor-plugin",
+  "license": "MIT",
+  "keywords": [
+    "coder",
+    "cloud development environments",
+    "remote development",
+    "workspaces",
+    "terraform",
+    "templates",
+    "mcp",
+    "self-hosted",
+    "ai agents",
+    "devops"
+  ],
+  "logo": "assets/logo.svg",
+  "variables": {
+    "type": "object",
+    "properties": {
+      "CODER_URL": {
+        "type": "string",
+        "title": "Coder deployment URL",
+        "description": "Base URL of your Coder deployment, e.g. https://coder.example.com. No trailing slash."
+      }
+    },
+    "required": [
+      "CODER_URL"
+    ]
+  }
+}

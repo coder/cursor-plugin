@@ -1,0 +1,49 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  validate:
+    name: Validate plugin
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate manifests and frontmatter
+        run: node scripts/validate-template.mjs
+
+      - name: Check plugin and marketplace versions match
+        run: |
+          set -euo pipefail
+          PLUGIN=$(jq -er '.version' plugins/coder/.cursor-plugin/plugin.json)
+          MARKET=$(jq -er '.metadata.version' .cursor-plugin/marketplace.json)
+          if [ "$PLUGIN" != "$MARKET" ]; then
+            echo "::error::plugin.json is $PLUGIN but marketplace.json is $MARKET"
+            exit 1
+          fi
+          if ! printf '%s' "$PLUGIN" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::version '$PLUGIN' is not X.Y.Z"
+            exit 1
+          fi
+
+      - name: Check vendored skills match the pin
+        run: |
+          set -euo pipefail
+          node .github/scripts/sync-skills.mjs
+          if ! git diff --quiet -- plugins/coder/skills; then
+            echo "::error::vendored skills differ from the pinned coder/skills ref. Run node .github/scripts/sync-skills.mjs and commit."
+            git diff --stat -- plugins/coder/skills
+            exit 1
+          fi

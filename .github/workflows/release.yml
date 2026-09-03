@@ -1,0 +1,60 @@
+# Tags and publishes a GitHub Release when the plugin version on main has no
+# tag yet. The version in plugin.json is canonical.
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version
+        id: version
+        run: |
+          set -euo pipefail
+          VERSION=$(jq -er '.version' plugins/coder/.cursor-plugin/plugin.json)
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "v$VERSION already released"
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v4
+        if: steps.version.outputs.release == 'true'
+        with:
+          node-version: "22"
+
+      - name: Validate before releasing
+        if: steps.version.outputs.release == 'true'
+        run: node scripts/validate-template.mjs
+
+      - name: Package plugin
+        if: steps.version.outputs.release == 'true'
+        run: git archive --format=zip --output=coder-cursor-plugin.zip HEAD -- ':(exclude).github'
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            coder-cursor-plugin.zip \
+            --target "$GITHUB_SHA" \
+            --title "v${{ steps.version.outputs.version }}" \
+            --generate-notes

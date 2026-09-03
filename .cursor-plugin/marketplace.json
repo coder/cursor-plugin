@@ -1,0 +1,19 @@
+{
+  "name": "coder-cursor-plugins",
+  "owner": {
+    "name": "Coder",
+    "email": "support@coder.com"
+  },
+  "metadata": {
+    "description": "Coder plugins for Cursor",
+    "version": "0.0.1",
+    "pluginRoot": "plugins"
+  },
+  "plugins": [
+    {
+      "name": "coder",
+      "source": "coder",
+      "description": "Connect Cursor to your self-hosted Coder deployment: manage workspaces, templates, and Coder Agents through MCP, plus skills for installing and operating Coder."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "repo": "coder/skills",
+  "pin": "v0.2.0",
+  "paths": [
+    "skills/setup",
+    "skills/templates",
+    "skills/modules"
+  ]
+}
