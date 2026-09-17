@@ -55,10 +55,10 @@ The configured URL persists across plugin updates. Team admins can set it
 for everyone in the Cursor dashboard under **Plugins > Configure**.
 
 > [!NOTE]
-> `CODER_URL` is a plugin variable, not an environment variable. Cursor
-> resolves `${CODER_URL}` in `mcp.json` from what you enter under
-> **Configure**; a `CODER_URL` exported in the shell Cursor was launched
-> from is not picked up, even inside a Coder workspace.
+> `CODER_URL` comes from plugin settings, by design — never from the
+> environment. Cursor resolves it from what you enter under **Configure**,
+> so a `CODER_URL` exported in your shell is ignored, including inside a
+> Coder workspace.
 
 ### Install from source
 
