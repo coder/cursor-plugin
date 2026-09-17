@@ -23,8 +23,10 @@ to `main`.
 3. Bump `version` in `plugins/coder/.cursor-plugin/plugin.json` and
    `metadata.version` in `.cursor-plugin/marketplace.json`. Cursor skips
    installs whose version has not changed.
-4. Run `node scripts/validate-template.mjs`.
-5. Commit the pin bump, the regenerated skills, and the version bump together.
+4. Add an entry to `plugins/coder/CHANGELOG.md` for the new version.
+5. Run `node scripts/validate-template.mjs`.
+6. Commit the pin bump, the regenerated skills, the version bump, and the
+   changelog entry together.
 
 Do not hand-edit the vendored directories. Fix them upstream in
 `coder/skills` and re-sync.

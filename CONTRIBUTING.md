@@ -6,6 +6,7 @@
 .cursor-plugin/marketplace.json   Marketplace manifest
 plugins/coder/                    The Coder plugin
   .cursor-plugin/plugin.json      Plugin manifest (canonical version)
+  CHANGELOG.md                    Release history
   skills/                         vendored coder/skills (workspaces, setup, templates, modules)
   assets/logo.svg
 scripts/validate-template.mjs     Manifest and frontmatter validation
@@ -34,7 +35,8 @@ scripts/validate-template.mjs     Manifest and frontmatter validation
 1. Bump `version` in `plugins/coder/.cursor-plugin/plugin.json` and
    `metadata.version` in `.cursor-plugin/marketplace.json` to the same value.
    The `validate` workflow fails if they differ.
-2. Merge to `main`. The `release` workflow tags `vX.Y.Z` and publishes a
+2. Add an entry to `plugins/coder/CHANGELOG.md` for the new version.
+3. Merge to `main`. The `release` workflow tags `vX.Y.Z` and publishes a
    GitHub Release when the version has no existing tag.
 
 Cursor re-indexes the marketplace from `main`, so users receive the update
