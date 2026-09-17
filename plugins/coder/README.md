@@ -1,11 +1,14 @@
 # Coder
 
 Skills to install, configure, and operate a self-hosted Coder deployment
-from Cursor.
+from Cursor, plus the Coder MCP server for delegating tasks to Coder
+Agents.
 
 ## Included
 
 - `skills/workspaces/`, `skills/setup/`, `skills/templates/`, `skills/modules/`: vendored from [coder/skills](https://github.com/coder/skills)
+- `mcp.json`: Coder remote MCP server at `${CODER_URL}/api/experimental/mcp/http`, resolved from the environment or the plugin's `CODER_URL` variable. Used by `/coder-agent`.
+- `commands/coder-agent.md`: delegate a task to a Coder Agent and supervise it, through MCP
 
 See the [repository README](../../README.md) for setup and usage, and
 [CHANGELOG.md](CHANGELOG.md) for release history.

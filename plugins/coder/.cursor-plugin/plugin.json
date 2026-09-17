@@ -1,8 +1,8 @@
 {
   "name": "coder",
   "displayName": "Coder",
-  "version": "0.1.0",
-  "description": "Skills to install, configure, and operate a self-hosted Coder deployment from Cursor, including managing workspaces through the Coder CLI.",
+  "version": "0.2.0",
+  "description": "Skills to install, configure, and operate a self-hosted Coder deployment from Cursor, plus the Coder MCP server for delegating tasks to Coder Agents.",
   "author": {
     "name": "Coder",
     "email": "support@coder.com",
@@ -18,8 +18,23 @@
     "workspaces",
     "terraform",
     "templates",
+    "mcp",
     "self-hosted",
+    "ai agents",
     "devops"
   ],
-  "logo": "assets/logo.svg"
+  "logo": "assets/logo.svg",
+  "variables": {
+    "type": "object",
+    "properties": {
+      "CODER_URL": {
+        "type": "string",
+        "title": "Coder deployment URL",
+        "description": "Base URL of your Coder deployment, e.g. https://coder.example.com. No trailing slash."
+      }
+    },
+    "required": [
+      "CODER_URL"
+    ]
+  }
 }
