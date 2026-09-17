@@ -7,15 +7,17 @@ Bundles skills for installing, configuring, and operating a self-hosted
 
 | Component | Feature | Description |
 | --- | --- | --- |
+| **Skill** | `workspaces` | Operate a Coder deployment through the `coder` CLI: list, inspect, create, start, stop, and delete workspaces; run commands and edit files over `coder ssh`; forward ports; read logs. |
 | **Skill** | `setup` | Install and bootstrap a new Coder deployment on Docker, Kubernetes, or a VM, including the first admin user and first template. |
 | **Skill** | `templates` | Create, edit, push, and version Coder templates (Terraform). |
 | **Skill** | `modules` | Add or update modules from [registry.coder.com](https://registry.coder.com/modules) in an existing template, such as IDEs, AI agents, and dotfiles. |
 
-The `setup`, `templates`, and `modules` skills are vendored from
-[coder/skills](https://github.com/coder/skills). See [VENDOR.md](VENDOR.md).
+The `workspaces`, `setup`, `templates`, and `modules` skills are vendored
+from [coder/skills](https://github.com/coder/skills). See [VENDOR.md](VENDOR.md).
 
 ## Prerequisites
 
+- **Coder CLI** on `PATH` and logged in (`coder login <deployment-url>`).
 - **Cursor** with AI features enabled.
 - The skills use the Coder CLI and Terraform when available.
 
@@ -33,15 +35,19 @@ For a fork or a pre-release, place the plugin folder in
 
 ## Verify
 
-**Customize > Plugins** shows the Coder plugin as installed.
+1. **Customize > Plugins** shows the Coder plugin as installed.
+2. Ask the agent: "List my Coder workspaces." It should run `coder list`.
 
 ## Usage
 
 | Ask the agent | What happens |
 | --- | --- |
-| "Set up Coder on this VM." | Uses the `setup` skill to install and bootstrap a deployment. |
+| "List my workspaces." | Runs `coder list -o json`. |
+| "Start my `backend` workspace and tail the build logs." | Runs `coder start` and follows `coder logs`. |
+| "Run the tests in my `api` workspace." | Runs `coder ssh api -- <command>`. |
 | "Which templates can I use, and what parameters does `kubernetes` take?" | Uses the `templates` skill to inspect templates. |
 | "Add JetBrains Gateway to my Docker template." | Uses the `modules` skill to add the registry module. |
+| "Set up Coder on this VM." | Uses the `setup` skill to install and bootstrap a deployment. |
 
 ## Self-hosted and air-gapped deployments
 
@@ -50,6 +56,13 @@ sent to Coder Inc. The `setup`, `templates`, and `modules` skills read
 [coder.com/docs](https://coder.com/docs) and
 [registry.coder.com](https://registry.coder.com) for current details; in an
 air-gapped environment they fall back to the knowledge in the skill itself.
+
+## Troubleshooting
+
+| Symptom | Fix |
+| --- | --- |
+| `coder: command not found` | Install the CLI: `curl -fsSL https://coder.com/install.sh \| sh`. |
+| Workspace commands fail with an auth error | Run `coder login <deployment-url>`. |
 
 ## Contributing
 

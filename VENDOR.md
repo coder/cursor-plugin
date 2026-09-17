@@ -1,8 +1,9 @@
 # Vendored skills
 
-`plugins/coder/skills/setup`, `plugins/coder/skills/templates`, and
-`plugins/coder/skills/modules` are vendored from
-[coder/skills](https://github.com/coder/skills) and committed to `main`.
+`plugins/coder/skills/workspaces`, `plugins/coder/skills/setup`,
+`plugins/coder/skills/templates`, and `plugins/coder/skills/modules` are
+vendored from [coder/skills](https://github.com/coder/skills) and committed
+to `main`.
 
 | | |
 | --- | --- |

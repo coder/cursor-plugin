@@ -1,9 +1,10 @@
 {
   "repo": "coder/skills",
-  "pin": "v0.2.0",
+  "pin": "e439e4bf0e9b517292adaac92d1c1b029810603c",
   "paths": [
     "skills/setup",
     "skills/templates",
-    "skills/modules"
+    "skills/modules",
+    "skills/workspaces"
   ]
 }
