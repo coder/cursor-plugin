@@ -13,7 +13,7 @@
     {
       "name": "coder",
       "source": "coder",
-      "description": "Connect Cursor to your self-hosted Coder deployment: manage workspaces, templates, and Coder Agents through MCP, plus skills for installing and operating Coder."
+      "description": "Skills to install, configure, and operate a self-hosted Coder deployment from Cursor."
     }
   ]
 }

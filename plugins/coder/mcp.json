@@ -1,7 +1,0 @@
-{
-  "mcpServers": {
-    "coder": {
-      "url": "${CODER_URL}/api/experimental/mcp/http"
-    }
-  }
-}

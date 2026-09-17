@@ -6,9 +6,7 @@
 .cursor-plugin/marketplace.json   Marketplace manifest
 plugins/coder/                    The Coder plugin
   .cursor-plugin/plugin.json      Plugin manifest (canonical version)
-  mcp.json                        Coder remote MCP server
-  skills/                         coder-workspaces (native) + vendored coder/skills
-  commands/                       /coder-agent
+  skills/                         vendored coder/skills (setup, templates, modules)
   assets/logo.svg
 scripts/validate-template.mjs     Manifest and frontmatter validation
 .github/scripts/sync-skills.mjs   Re-vendor skills from coder/skills
