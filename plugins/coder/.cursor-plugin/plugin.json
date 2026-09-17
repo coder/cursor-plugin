@@ -30,7 +30,7 @@
       "CODER_URL": {
         "type": "string",
         "title": "Coder deployment URL",
-        "description": "Base URL of your Coder deployment, e.g. https://coder.example.com. No trailing slash."
+        "description": "Base URL of your Coder deployment, e.g. https://coder.example.com. Must not end in a slash, or the MCP endpoint resolves to a double slash and returns 404. Used only by /coder-agent; the skills work without it."
       }
     },
     "required": [

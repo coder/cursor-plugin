@@ -37,26 +37,28 @@ from [coder/skills](https://github.com/coder/skills). See [VENDOR.md](VENDOR.md)
   [MCP server docs](https://coder.com/docs/ai-coder/mcp-server#remote-mcp-server)
   and the
   [OAuth2 provider docs](https://coder.com/docs/admin/integrations/oauth2-provider).
-- Only for `/coder-agent`: **your Coder access URL**, for example
-  `https://coder.example.com` (no trailing slash). Entered once after
-  install.
+- **Your Coder access URL**, for example `https://coder.example.com` (no
+  trailing slash). Cursor asks for it when the plugin is installed and only
+  `/coder-agent` uses it; the skills work without it.
 
 ## Installation
 
 1. Open **Customize > Plugins** in Cursor.
 2. Search for **Coder** and open the plugin.
 3. Choose **Add to Cursor**, then **Add Plugin**.
-4. If you plan to use `/coder-agent`, enter your access URL under
-   **Customize > Plugins > Coder > Configure**, then connect the `coder`
-   server in **Tools & MCP** and sign in through the browser.
+4. Enter your access URL when Cursor asks for it, or later under
+   **Customize > Plugins > Coder > Configure**.
+5. To use `/coder-agent`, connect the `coder` server in **Tools & MCP** and
+   sign in through the browser. The skills need no further setup.
 
 The configured URL persists across plugin updates. Team admins can set it
 for everyone in the Cursor dashboard under **Plugins > Configure**.
 
 > [!NOTE]
-> If `CODER_URL` is set in the environment Cursor is launched from — always
-> true inside a Coder workspace — it takes precedence and no configuration
-> is needed.
+> `CODER_URL` is a plugin variable, not an environment variable. Cursor
+> resolves `${CODER_URL}` in `mcp.json` from what you enter under
+> **Configure**; a `CODER_URL` exported in the shell Cursor was launched
+> from is not picked up, even inside a Coder workspace.
 
 ### Install from source
 
@@ -114,7 +116,8 @@ air-gapped environment they fall back to the knowledge in the skill itself.
 | Workspace commands fail with an auth error | Run `coder login <deployment-url>`. |
 | No `coder_*` tools in the agent (`/coder-agent`) | Reconnect the `coder` server in **Tools & MCP**. |
 | `coder` server shows a literal `${CODER_URL}` URL or an Invalid URL error | The URL has not been configured. Set it under **Customize > Plugins > Coder > Configure**, without a trailing slash. |
-| `404` from the MCP endpoint | The deployment is missing the `mcp-server-http` experiment, or is older than v2.38. |
+| `404` from the MCP endpoint, with `//api/experimental/` in the URL | The configured URL has a trailing slash. Remove it under **Configure** — the path is appended verbatim, so a trailing slash produces a double slash. |
+| `404` from the MCP endpoint, URL otherwise correct | The deployment is missing the `mcp-server-http` experiment, or is older than v2.38. |
 | `Unauthorized` on every MCP tool call | Reconnect the `coder` server in **Tools & MCP**, or your token expired. |
 | OAuth browser login never completes | Check the browser can reach your Coder access URL and that `CODER_OAUTH2_PROVIDER_ENABLE=true` is set. |
 
