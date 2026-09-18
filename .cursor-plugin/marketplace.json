@@ -13,7 +13,7 @@
     {
       "name": "coder",
       "source": "coder",
-      "description": "Skills to install, configure, and operate a self-hosted Coder deployment from Cursor, including managing workspaces through the Coder CLI."
+      "description": "Bundles skills for installing, configuring, and operating a self-hosted Coder deployment from Cursor."
     }
   ]
 }
