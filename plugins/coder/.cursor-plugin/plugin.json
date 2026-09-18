@@ -2,7 +2,7 @@
   "name": "coder",
   "displayName": "Coder",
   "version": "0.1.0",
-  "description": "Bundles skills for installing, configuring, and operating a self-hosted Coder deployment from Cursor.",
+  "description": "Skills for installing, configuring, and operating a self-hosted Coder deployment from the Cursor IDE.",
   "author": {
     "name": "Coder",
     "email": "support@coder.com",

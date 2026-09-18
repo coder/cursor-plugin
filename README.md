@@ -1,7 +1,7 @@
 # Coder plugin for Cursor
 
-Bundles skills for installing, configuring, and operating a self-hosted
-[Coder](https://coder.com) deployment from [Cursor](https://cursor.com).
+Skills for installing, configuring, and operating a self-hosted
+[Coder](https://coder.com) deployment from the [Cursor](https://cursor.com) IDE.
 
 ## Features
 

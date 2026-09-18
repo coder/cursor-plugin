@@ -1,7 +1,7 @@
 # Coder
 
-Bundles skills for installing, configuring, and operating a self-hosted
-Coder deployment from Cursor.
+Skills for installing, configuring, and operating a self-hosted Coder
+deployment from the Cursor IDE.
 
 ## Included
 
