@@ -13,7 +13,7 @@
     {
       "name": "coder",
       "source": "coder",
-      "description": "Skills for installing, configuring, and operating a self-hosted Coder deployment from the Cursor IDE, plus the Coder MCP server for delegating tasks to Coder Agents."
+      "description": "Skills for installing, configuring, and operating a self-hosted Coder deployment from the Cursor IDE, plus the Coder MCP server for managing and using the deployment: workspaces, templates, and Coder Agents."
     }
   ]
 }

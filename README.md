@@ -2,7 +2,8 @@
 
 Skills for installing, configuring, and operating a self-hosted
 [Coder](https://coder.com) deployment from the [Cursor](https://cursor.com)
-IDE, plus Coder's remote MCP server for delegating work to Coder Agents.
+IDE, plus Coder's remote MCP server for managing and using the deployment:
+workspaces, templates, and Coder Agents.
 
 ## Features
 
@@ -12,7 +13,7 @@ IDE, plus Coder's remote MCP server for delegating work to Coder Agents.
 | **Skill** | `setup` | Install and bootstrap a new Coder deployment on Docker, Kubernetes, or a VM, including the first admin user and first template. |
 | **Skill** | `templates` | Create, edit, push, and version Coder templates (Terraform). |
 | **Skill** | `modules` | Add or update modules from [registry.coder.com](https://registry.coder.com/modules) in an existing template, such as IDEs, AI agents, and dotfiles. |
-| **MCP** | Coder MCP server | Remote MCP server at `${CODER_URL}/api/experimental/mcp/http`, authenticated with OAuth2. Used only by `/coder-agent` to create and supervise Coder Agents chats. |
+| **MCP** | Coder MCP server | Remote MCP server at `${CODER_URL}/api/experimental/mcp/http`, authenticated with OAuth2. Gives the agent Coder's own tools for workspaces, templates, files, logs, and Coder Agents chats. Required by `/coder-agent`; the skills work without it. |
 | **Command** | `/coder-agent` | Delegate a task to a Coder Agent on your deployment and supervise it: create the chat, relay questions, and report the outcome. Requires the MCP server. |
 
 The `workspaces`, `setup`, `templates`, and `modules` skills are vendored
