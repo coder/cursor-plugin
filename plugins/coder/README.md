@@ -1,8 +1,8 @@
 # Coder
 
-Skills to install, configure, and operate a self-hosted Coder deployment
-from Cursor, plus the Coder MCP server for delegating tasks to Coder
-Agents.
+Skills for installing, configuring, and operating a self-hosted Coder
+deployment from the Cursor IDE, plus the Coder MCP server for delegating
+tasks to Coder Agents.
 
 ## Included
 

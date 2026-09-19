@@ -1,8 +1,8 @@
 # Coder plugin for Cursor
 
-Bundles skills for installing, configuring, and operating a self-hosted
-[Coder](https://coder.com) deployment from [Cursor](https://cursor.com), and
-attaches Coder's remote MCP server for delegating work to Coder Agents.
+Skills for installing, configuring, and operating a self-hosted
+[Coder](https://coder.com) deployment from the [Cursor](https://cursor.com)
+IDE, plus Coder's remote MCP server for delegating work to Coder Agents.
 
 ## Features
 
