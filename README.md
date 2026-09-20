@@ -1,7 +1,9 @@
 # Coder plugin for Cursor
 
 Skills for installing, configuring, and operating a self-hosted
-[Coder](https://coder.com) deployment from the [Cursor](https://cursor.com) IDE.
+[Coder](https://coder.com) deployment from the [Cursor](https://cursor.com)
+IDE, plus Coder's remote MCP server for managing and using the deployment:
+workspaces, templates, and Coder Agents.
 
 ## Features
 
@@ -11,6 +13,8 @@ Skills for installing, configuring, and operating a self-hosted
 | **Skill** | `setup` | Install and bootstrap a new Coder deployment on Docker, Kubernetes, or a VM, including the first admin user and first template. |
 | **Skill** | `templates` | Create, edit, push, and version Coder templates (Terraform). |
 | **Skill** | `modules` | Add or update modules from [registry.coder.com](https://registry.coder.com/modules) in an existing template, such as IDEs, AI agents, and dotfiles. |
+| **MCP** | Coder MCP server | Remote MCP server at `${CODER_URL}/api/experimental/mcp/http`, authenticated with OAuth2. Gives the agent Coder's own tools for workspaces, templates, files, logs, and Coder Agents chats. Required by `/coder-agent`; the skills work without it. |
+| **Command** | `/coder-agent` | Delegate a task to a Coder Agent on your deployment and supervise it: create the chat, relay questions, and report the outcome. Requires the MCP server. |
 
 The `workspaces`, `setup`, `templates`, and `modules` skills are vendored
 from [coder/skills](https://github.com/coder/skills). See [VENDOR.md](VENDOR.md).
@@ -18,14 +22,45 @@ from [coder/skills](https://github.com/coder/skills). See [VENDOR.md](VENDOR.md)
 ## Prerequisites
 
 - **Coder CLI** on `PATH` and logged in (`coder login <deployment-url>`).
+  Used by the `workspaces`, `setup`, `templates`, and `modules` skills;
+  none of them require the MCP server.
 - **Cursor** with AI features enabled.
-- The skills use the Coder CLI and Terraform when available.
+- Only for the MCP server: a **Coder deployment on v2.38 or later**, with
+  the remote MCP server and the OAuth2 provider enabled. A deployment
+  admin sets these server-side; they cannot be turned on from Cursor:
+
+  ```sh
+  CODER_EXPERIMENTS=mcp-server-http CODER_OAUTH2_PROVIDER_ENABLE=true coder server
+  ```
+
+  As of v2.38, `oauth2` is a GA feature turned on with
+  `CODER_OAUTH2_PROVIDER_ENABLE=true`, no longer an experiment.
+  `mcp-server-http` is still experimental. See the
+  [MCP server docs](https://coder.com/docs/ai-coder/mcp-server#remote-mcp-server)
+  and the
+  [OAuth2 provider docs](https://coder.com/docs/admin/integrations/oauth2-provider).
+- **Your Coder access URL**, for example `https://coder.example.com` (no
+  trailing slash). Cursor asks for it when the plugin is installed. Only
+  the MCP server uses it; the skills work without it.
 
 ## Installation
 
 1. Open **Customize > Plugins** in Cursor.
 2. Search for **Coder** and open the plugin.
 3. Choose **Add to Cursor**, then **Add Plugin**.
+4. Enter your access URL when Cursor asks for it, or later under
+   **Customize > Plugins > Coder > Configure**.
+5. To use `/coder-agent`, connect the `coder` server in **Tools & MCP** and
+   sign in through the browser. The skills need no further setup.
+
+The configured URL persists across plugin updates. Team admins can set it
+for everyone in the Cursor dashboard under **Plugins > Configure**.
+
+> [!NOTE]
+> `CODER_URL` comes from plugin settings, by design — never from the
+> environment. Cursor resolves it from what you enter under **Configure**,
+> so a `CODER_URL` exported in your shell is ignored, including inside a
+> Coder workspace.
 
 ### Install from source
 
@@ -37,6 +72,23 @@ For a fork or a pre-release, place the plugin folder in
 
 1. **Customize > Plugins** shows the Coder plugin as installed.
 2. Ask the agent: "List my Coder workspaces." It should run `coder list`.
+3. For `/coder-agent`: **Cursor Settings > Tools & MCP** shows the `coder`
+   server as connected, and asking "Who am I on Coder?" calls
+   `coder_get_authenticated_user`.
+
+## Authentication
+
+For `/coder-agent`, Cursor discovers Coder's OAuth2 endpoints through
+[RFC 9728](https://datatracker.ietf.org/doc/html/rfc9728) and prompts you to
+sign in through your browser on first use. No tokens are stored in the
+plugin.
+
+If your deployment cannot use OAuth2, create a token under **Settings >
+Tokens** in the Coder UI and add it as a `Coder-Session-Token` header on the
+`coder` server in Cursor's MCP settings.
+
+The `workspaces`, `setup`, `templates`, and `modules` skills instead use
+whatever session the `coder` CLI already has from `coder login`.
 
 ## Usage
 
@@ -48,6 +100,7 @@ For a fork or a pre-release, place the plugin folder in
 | "Which templates can I use, and what parameters does `kubernetes` take?" | Uses the `templates` skill to inspect templates. |
 | "Add JetBrains Gateway to my Docker template." | Uses the `modules` skill to add the registry module. |
 | "Set up Coder on this VM." | Uses the `setup` skill to install and bootstrap a deployment. |
+| "Delegate this refactor to a Coder Agent and tell me when it's done." | Creates a Coder Agents chat with `coder_create_chat` and waits with `coder_await_chat`. |
 
 ## Self-hosted and air-gapped deployments
 
@@ -63,6 +116,14 @@ air-gapped environment they fall back to the knowledge in the skill itself.
 | --- | --- |
 | `coder: command not found` | Install the CLI: `curl -fsSL https://coder.com/install.sh \| sh`. |
 | Workspace commands fail with an auth error | Run `coder login <deployment-url>`. |
+| No `coder_*` tools in the agent (`/coder-agent`) | Reconnect the `coder` server in **Tools & MCP**. |
+| `coder` server shows a literal `${CODER_URL}` URL or an Invalid URL error | The URL has not been configured. Set it under **Customize > Plugins > Coder > Configure**, without a trailing slash. |
+| `404` from the MCP endpoint, with `//api/experimental/` in the URL | The configured URL has a trailing slash. Remove it under **Configure** — the path is appended verbatim, so a trailing slash produces a double slash. |
+| `404` from the MCP endpoint, URL otherwise correct | The deployment is missing the `mcp-server-http` experiment, or is older than v2.38. Ask a deployment admin — this is not fixable from Cursor. |
+| `Unauthorized` on every MCP tool call | Reconnect the `coder` server in **Tools & MCP**, or your token expired. |
+| OAuth browser login never completes | Check the browser can reach your Coder access URL. If it can, ask a deployment admin to confirm `CODER_OAUTH2_PROVIDER_ENABLE=true` is set server-side. |
+
+More in the [MCP server troubleshooting docs](https://coder.com/docs/ai-coder/mcp-server#troubleshooting).
 
 ## Contributing
 
