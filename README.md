@@ -25,8 +25,9 @@ from [coder/skills](https://github.com/coder/skills). See [VENDOR.md](VENDOR.md)
   Used by the `workspaces`, `setup`, `templates`, and `modules` skills;
   none of them require the MCP server.
 - **Cursor** with AI features enabled.
-- Only for `/coder-agent`: a **Coder deployment on v2.38 or later**, with
-  the remote MCP server and the OAuth2 provider enabled:
+- Only for the MCP server: a **Coder deployment on v2.38 or later**, with
+  the remote MCP server and the OAuth2 provider enabled. A deployment
+  admin sets these server-side; they cannot be turned on from Cursor:
 
   ```sh
   CODER_EXPERIMENTS=mcp-server-http CODER_OAUTH2_PROVIDER_ENABLE=true coder server
@@ -39,8 +40,8 @@ from [coder/skills](https://github.com/coder/skills). See [VENDOR.md](VENDOR.md)
   and the
   [OAuth2 provider docs](https://coder.com/docs/admin/integrations/oauth2-provider).
 - **Your Coder access URL**, for example `https://coder.example.com` (no
-  trailing slash). Cursor asks for it when the plugin is installed and only
-  `/coder-agent` uses it; the skills work without it.
+  trailing slash). Cursor asks for it when the plugin is installed. Only
+  the MCP server uses it; the skills work without it.
 
 ## Installation
 
@@ -118,7 +119,7 @@ air-gapped environment they fall back to the knowledge in the skill itself.
 | No `coder_*` tools in the agent (`/coder-agent`) | Reconnect the `coder` server in **Tools & MCP**. |
 | `coder` server shows a literal `${CODER_URL}` URL or an Invalid URL error | The URL has not been configured. Set it under **Customize > Plugins > Coder > Configure**, without a trailing slash. |
 | `404` from the MCP endpoint, with `//api/experimental/` in the URL | The configured URL has a trailing slash. Remove it under **Configure** — the path is appended verbatim, so a trailing slash produces a double slash. |
-| `404` from the MCP endpoint, URL otherwise correct | The deployment is missing the `mcp-server-http` experiment, or is older than v2.38. |
+| `404` from the MCP endpoint, URL otherwise correct | The deployment is missing the `mcp-server-http` experiment, or is older than v2.38. Ask a deployment admin — this is not fixable from Cursor. |
 | `Unauthorized` on every MCP tool call | Reconnect the `coder` server in **Tools & MCP**, or your token expired. |
 | OAuth browser login never completes | Check the browser can reach your Coder access URL and that `CODER_OAUTH2_PROVIDER_ENABLE=true` is set. |
 
