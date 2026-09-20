@@ -121,7 +121,7 @@ air-gapped environment they fall back to the knowledge in the skill itself.
 | `404` from the MCP endpoint, with `//api/experimental/` in the URL | The configured URL has a trailing slash. Remove it under **Configure** — the path is appended verbatim, so a trailing slash produces a double slash. |
 | `404` from the MCP endpoint, URL otherwise correct | The deployment is missing the `mcp-server-http` experiment, or is older than v2.38. Ask a deployment admin — this is not fixable from Cursor. |
 | `Unauthorized` on every MCP tool call | Reconnect the `coder` server in **Tools & MCP**, or your token expired. |
-| OAuth browser login never completes | Check the browser can reach your Coder access URL and that `CODER_OAUTH2_PROVIDER_ENABLE=true` is set. |
+| OAuth browser login never completes | Check the browser can reach your Coder access URL. If it can, ask a deployment admin to confirm `CODER_OAUTH2_PROVIDER_ENABLE=true` is set server-side. |
 
 More in the [MCP server troubleshooting docs](https://coder.com/docs/ai-coder/mcp-server#troubleshooting).
 
