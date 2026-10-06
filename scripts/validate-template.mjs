@@ -232,6 +232,272 @@ async function validateComponentFrontmatter(pluginDir, pluginName) {
   }
 }
 
+// Agent Plugins 1.0.0 (https://github.com/agentplugins/agent-plugins-spec).
+// The checks below mirror the closed schemas in spec/1.0.0.md so CI needs no
+// network access or schema validator dependency.
+const AGENT_PLUGIN_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json";
+const AGENT_MCP_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json";
+const agentPluginNamePattern = /^(?!.*(?:--|\.\.))[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/;
+const agentSkillNamePattern = /^(?!.*--)[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+const agentManifestFields = [
+  "$schema",
+  "name",
+  "version",
+  "description",
+  "author",
+  "homepage",
+  "repository",
+  "license",
+  "keywords",
+  "extensions",
+];
+// Metadata that must be identical in plugin.json and .cursor-plugin/plugin.json.
+const sharedManifestFields = [
+  "name",
+  "version",
+  "description",
+  "author",
+  "homepage",
+  "repository",
+  "license",
+  "keywords",
+];
+
+function isPlainObject(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function isDeepEqual(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function validateAgentManifest(manifest, pluginName) {
+  const label = `${pluginName}: plugin.json`;
+
+  for (const key of Object.keys(manifest)) {
+    if (!agentManifestFields.includes(key)) {
+      addError(
+        `${label} has unknown top-level field "${key}". Move client-specific data under "extensions" or keep it in .cursor-plugin/plugin.json.`
+      );
+    }
+  }
+
+  if (manifest.$schema !== AGENT_PLUGIN_SCHEMA) {
+    addError(`${label} "$schema" must be "${AGENT_PLUGIN_SCHEMA}".`);
+  }
+
+  if (
+    typeof manifest.name !== "string" ||
+    manifest.name.length === 0 ||
+    manifest.name.length > 64 ||
+    !agentPluginNamePattern.test(manifest.name)
+  ) {
+    addError(
+      `${label} "name" must be 1-64 lowercase alphanumerics, hyphens, or periods, start and end alphanumeric, with no "--" or "..".`
+    );
+  }
+
+  for (const key of ["version", "description", "homepage", "repository", "license"]) {
+    if (manifest[key] !== undefined && typeof manifest[key] !== "string") {
+      addError(`${label} "${key}" must be a string.`);
+    }
+  }
+
+  if (manifest.author !== undefined) {
+    if (!isPlainObject(manifest.author)) {
+      addError(`${label} "author" must be an object.`);
+    } else {
+      for (const [key, value] of Object.entries(manifest.author)) {
+        if (!["name", "email", "url"].includes(key) || typeof value !== "string") {
+          addError(`${label} "author" may only contain string "name", "email", and "url" fields.`);
+          break;
+        }
+      }
+    }
+  }
+
+  if (
+    manifest.keywords !== undefined &&
+    (!Array.isArray(manifest.keywords) || manifest.keywords.some((k) => typeof k !== "string"))
+  ) {
+    addError(`${label} "keywords" must be an array of strings.`);
+  }
+
+  if (manifest.extensions !== undefined) {
+    if (!isPlainObject(manifest.extensions)) {
+      addError(`${label} "extensions" must be an object.`);
+    } else if (Object.values(manifest.extensions).some((value) => !isPlainObject(value))) {
+      addError(`${label} every "extensions" namespace value must be an object.`);
+    }
+  }
+}
+
+function validateAgentMcpServer(server, serverName, pluginName) {
+  const label = `${pluginName}: mcp.json server "${serverName}"`;
+  if (!isPlainObject(server)) {
+    addError(`${label} must be an object.`);
+    return;
+  }
+
+  const variants = {
+    stdio: { required: ["type", "command"], allowed: ["type", "command", "args", "env", "cwd"] },
+    "streamable-http": { required: ["type", "url"], allowed: ["type", "url", "headers"] },
+    sse: { required: ["type", "url"], allowed: ["type", "url", "headers"] },
+  };
+  const variant = variants[server.type];
+  if (!variant) {
+    addError(`${label} "type" must be one of: ${Object.keys(variants).join(", ")}.`);
+    return;
+  }
+
+  for (const key of variant.required) {
+    if (typeof server[key] !== "string" || server[key].length === 0) {
+      addError(`${label} requires a non-empty string "${key}".`);
+    }
+  }
+  for (const key of Object.keys(server)) {
+    if (!variant.allowed.includes(key)) {
+      addError(`${label} has field "${key}" that is not valid for type "${server.type}".`);
+    }
+  }
+
+  if (server.type === "stdio") {
+    if (server.args !== undefined && (!Array.isArray(server.args) || server.args.some((a) => typeof a !== "string"))) {
+      addError(`${label} "args" must be an array of strings.`);
+    }
+    if (server.env !== undefined) {
+      if (!isPlainObject(server.env) || Object.values(server.env).some((v) => typeof v !== "string")) {
+        addError(`${label} "env" must be an object of strings.`);
+      } else if ("PLUGIN_ROOT" in server.env || "PLUGIN_DATA" in server.env) {
+        addError(`${label} "env" must not set PLUGIN_ROOT or PLUGIN_DATA.`);
+      }
+    }
+    if (server.cwd !== undefined && !/^(?:\.\/|\$\{PLUGIN_ROOT\}(?:\/|$)|\$\{PLUGIN_DATA\}(?:\/|$))/.test(server.cwd)) {
+      addError(`${label} "cwd" must start with "./", "\${PLUGIN_ROOT}", or "\${PLUGIN_DATA}".`);
+    }
+  } else {
+    if (server.headers !== undefined) {
+      if (!isPlainObject(server.headers) || Object.values(server.headers).some((v) => typeof v !== "string")) {
+        addError(`${label} "headers" must be an object of strings.`);
+      }
+    }
+    // The spec forbids placeholder expansion in "url", so a client that
+    // follows it skips this server. Cursor expands plugin variables itself.
+    if (typeof server.url === "string" && server.url.includes("${")) {
+      addWarning(
+        `${pluginName}: mcp.json server "${serverName}" url contains a placeholder. Agent Plugins forbids expansion in "url", so only Cursor will connect to it.`
+      );
+    }
+  }
+}
+
+function readSkillFrontmatter(content) {
+  const match = normalizeNewlines(content).match(/^---\n([\s\S]*?)\n---\n/);
+  if (!match) {
+    return {};
+  }
+  const lines = match[1].split("\n");
+  const fields = {};
+  for (let i = 0; i < lines.length; i += 1) {
+    const field = lines[i].match(/^([A-Za-z][\w-]*):\s*(.*)$/);
+    if (!field) {
+      continue;
+    }
+    let value = field[2].trim();
+    // Folded (>) and literal (|) block scalars continue on indented lines.
+    if (/^[>|][+-]?$/.test(value)) {
+      const parts = [];
+      while (i + 1 < lines.length && /^\s+\S/.test(lines[i + 1])) {
+        parts.push(lines[i + 1].trim());
+        i += 1;
+      }
+      value = parts.join(" ");
+    }
+    fields[field[1]] = value.replace(/^(["'])(.*)\1$/, "$2");
+  }
+  return fields;
+}
+
+async function validateAgentSkills(pluginDir, pluginName) {
+  const skillsDir = path.join(pluginDir, "skills");
+  if (!(await pathExists(skillsDir))) {
+    return;
+  }
+  const entries = await fs.readdir(skillsDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isDirectory()) {
+      continue;
+    }
+    const skillFile = path.join(skillsDir, entry.name, "SKILL.md");
+    if (!(await pathExists(skillFile))) {
+      continue;
+    }
+    const label = `${pluginName}: skills/${entry.name}/SKILL.md`;
+    const fields = readSkillFrontmatter(await fs.readFile(skillFile, "utf8"));
+    if (fields.name !== entry.name) {
+      addError(
+        `${label} "name" (${JSON.stringify(fields.name)}) must match its directory name "${entry.name}". Fix it in coder/skills and re-vendor.`
+      );
+    }
+    if (
+      typeof fields.name === "string" &&
+      (fields.name.length > 64 || !agentSkillNamePattern.test(fields.name))
+    ) {
+      addError(`${label} "name" must be 1-64 lowercase alphanumerics and single hyphens, not starting or ending with a hyphen.`);
+    }
+    if (typeof fields.description !== "string" || fields.description.length === 0 || fields.description.length > 1024) {
+      addError(`${label} "description" must be 1-1024 characters.`);
+    }
+  }
+}
+
+async function validateAgentPlugin(pluginDir, pluginName, cursorManifest) {
+  const manifestPath = path.join(pluginDir, "plugin.json");
+  const manifest = await readJsonFile(manifestPath, `${pluginName} Agent Plugins manifest`);
+  if (manifest) {
+    if (!isPlainObject(manifest)) {
+      addError(`${pluginName}: plugin.json must contain a JSON object.`);
+    } else {
+      validateAgentManifest(manifest, pluginName);
+      for (const field of sharedManifestFields) {
+        if (!isDeepEqual(manifest[field], cursorManifest[field])) {
+          addError(
+            `${pluginName}: "${field}" differs between plugin.json and .cursor-plugin/plugin.json. Keep them identical.`
+          );
+        }
+      }
+    }
+  }
+
+  const mcpPath = path.join(pluginDir, "mcp.json");
+  if (await pathExists(mcpPath)) {
+    const mcp = await readJsonFile(mcpPath, `${pluginName} MCP configuration`);
+    if (mcp) {
+      if (!isPlainObject(mcp)) {
+        addError(`${pluginName}: mcp.json must contain a JSON object.`);
+      } else {
+        for (const key of Object.keys(mcp)) {
+          if (key !== "$schema" && key !== "mcpServers") {
+            addError(`${pluginName}: mcp.json has unknown top-level field "${key}".`);
+          }
+        }
+        if (mcp.$schema !== AGENT_MCP_SCHEMA) {
+          addError(`${pluginName}: mcp.json "$schema" must be "${AGENT_MCP_SCHEMA}".`);
+        }
+        if (!isPlainObject(mcp.mcpServers)) {
+          addError(`${pluginName}: mcp.json "mcpServers" must be an object.`);
+        } else {
+          for (const [serverName, server] of Object.entries(mcp.mcpServers)) {
+            validateAgentMcpServer(server, serverName, pluginName);
+          }
+        }
+      }
+    }
+  }
+
+  await validateAgentSkills(pluginDir, pluginName);
+}
+
 function resolveMarketplaceSource(source, pluginRoot) {
   if (typeof source !== "string" || source.length === 0) {
     return null;
@@ -343,6 +609,7 @@ async function main() {
     }
 
     await validateComponentFrontmatter(pluginDir, entry.name);
+    await validateAgentPlugin(pluginDir, entry.name, pluginManifest);
 
     const hooksPath = path.join(pluginDir, "hooks", "hooks.json");
     if (!(await pathExists(hooksPath))) {

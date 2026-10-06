@@ -108,6 +108,18 @@ whatever session the `coder` CLI already has from `coder login`.
 | "Set up Coder on this VM." | Uses the `setup` skill to install and bootstrap a deployment. |
 | "Delegate this refactor to a Coder Agent and tell me when it's done." | Creates a Coder Agents chat with `coder_create_chat` and waits with `coder_await_chat`. |
 
+## Other agents
+
+The plugin is also an [Agent Plugins 1.0](https://github.com/agentplugins/agent-plugins-spec)
+package (`plugins/coder/plugin.json`), so clients that support the standard,
+such as Codex and GitHub Copilot, can load the four skills. The skills work
+the same everywhere.
+
+The Coder MCP server and `/coder-agent` are Cursor-only. The server URL uses
+the `${CODER_URL}` plugin variable, which the standard does not allow in
+`url`, and commands are not part of the standard. Other clients skip the MCP
+server and keep the skills.
+
 ## Self-hosted and air-gapped deployments
 
 Everything in this plugin operates against your own deployment. Nothing is
