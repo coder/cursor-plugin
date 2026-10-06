@@ -115,10 +115,12 @@ package (`plugins/coder/plugin.json`), so clients that support the standard,
 such as Codex and GitHub Copilot, can load the four skills. The skills work
 the same everywhere.
 
-The Coder MCP server and `/coder-agent` are Cursor-only. The server URL uses
-the `${CODER_URL}` plugin variable, which the standard does not allow in
-`url`, and commands are not part of the standard. Other clients skip the MCP
-server and keep the skills.
+The Coder MCP server and `/coder-agent` are Cursor-only. Every deployment has
+its own URL, and the standard allows no placeholder in an MCP `url`, so the
+server is declared in `.cursor-plugin/mcp.json` with Cursor's `${CODER_URL}`
+plugin variable. The portable package has no root `mcp.json`, so other
+clients load the skills and ignore the server. Commands are not part of the
+standard either.
 
 ## Self-hosted and air-gapped deployments
 
