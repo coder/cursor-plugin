@@ -39,6 +39,12 @@ from [coder/skills](https://github.com/coder/skills). See [VENDOR.md](VENDOR.md)
   [MCP server docs](https://coder.com/docs/ai-coder/mcp-server#remote-mcp-server)
   and the
   [OAuth2 provider docs](https://coder.com/docs/admin/integrations/oauth2-provider).
+
+  An owner must also enable dynamic client registration so Cursor can
+  register itself as an OAuth client when users sign in. It is off by
+  default: run `coder oauth2-provider dcr enable`, or turn it on under
+  **Deployment Settings > OAuth2 Applications > Settings**. See
+  [Dynamic Client Registration](https://coder.com/docs/admin/integrations/oauth2-provider#dynamic-client-registration).
 - **Your Coder access URL**, for example `https://coder.example.com` (no
   trailing slash). Cursor asks for it when the plugin is installed. Only
   the MCP server uses it; the skills work without it.
