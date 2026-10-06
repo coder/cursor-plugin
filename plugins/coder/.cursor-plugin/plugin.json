@@ -24,6 +24,7 @@
     "devops"
   ],
   "logo": "assets/logo.svg",
+  "mcpServers": ".cursor-plugin/mcp.json",
   "variables": {
     "type": "object",
     "properties": {

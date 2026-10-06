@@ -7,8 +7,8 @@
 plugins/coder/                    The Coder plugin
   plugin.json                     Agent Plugins 1.0 manifest (portable)
   .cursor-plugin/plugin.json      Cursor manifest (canonical version)
+  .cursor-plugin/mcp.json         Coder remote MCP server (Cursor only, used by /coder-agent)
   CHANGELOG.md                    Release history
-  mcp.json                        Coder remote MCP server (used by /coder-agent)
   skills/                         vendored coder/skills (workspaces, setup, templates, modules)
   commands/                       /coder-agent
   assets/logo.svg

@@ -7,9 +7,9 @@ and using the deployment: workspaces, templates, and Coder Agents.
 ## Included
 
 - `plugin.json`: Agent Plugins 1.0 manifest, the portable metadata read by any conformant client
-- `.cursor-plugin/plugin.json`: Cursor manifest, which adds `displayName`, `logo`, and the `CODER_URL` variable
+- `.cursor-plugin/plugin.json`: Cursor manifest, which adds `displayName`, `logo`, `mcpServers`, and the `CODER_URL` variable
 - `skills/workspaces/`, `skills/setup/`, `skills/templates/`, `skills/modules/`: vendored from [coder/skills](https://github.com/coder/skills)
-- `mcp.json`: Coder remote MCP server at `${CODER_URL}/api/experimental/mcp/http`, where `${CODER_URL}` is the plugin variable the user sets under **Configure** (not a shell environment variable). Gives the agent Coder's tools for workspaces, templates, files, and Coder Agents chats; `/coder-agent` builds on it.
+- `.cursor-plugin/mcp.json`: Coder remote MCP server (Cursor only; referenced by `mcpServers` in the Cursor manifest) at `${CODER_URL}/api/experimental/mcp/http`, where `${CODER_URL}` is the plugin variable the user sets under **Configure** (not a shell environment variable). Gives the agent Coder's tools for workspaces, templates, files, and Coder Agents chats; `/coder-agent` builds on it.
 - `commands/coder-agent.md`: delegate a task to a Coder Agent and supervise it, through MCP
 
 See the [repository README](../../README.md) for setup and usage, and
