@@ -20,8 +20,9 @@ to `main`.
    node .github/scripts/sync-skills.mjs
    ```
 
-3. Bump `version` in `plugins/coder/.cursor-plugin/plugin.json` and
-   `metadata.version` in `.cursor-plugin/marketplace.json`. Cursor skips
+3. Bump `version` in `plugins/coder/.cursor-plugin/plugin.json`,
+   `plugins/coder/plugin.json`, and `metadata.version` in
+   `.cursor-plugin/marketplace.json`. Cursor skips
    installs whose version has not changed.
 4. Add an entry to `plugins/coder/CHANGELOG.md` for the new version.
 5. Run `node scripts/validate-template.mjs`.

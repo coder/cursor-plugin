@@ -28,9 +28,10 @@ jobs:
         run: |
           set -euo pipefail
           PLUGIN=$(jq -er '.version' plugins/coder/.cursor-plugin/plugin.json)
+          PORTABLE=$(jq -er '.version' plugins/coder/plugin.json)
           MARKET=$(jq -er '.metadata.version' .cursor-plugin/marketplace.json)
-          if [ "$PLUGIN" != "$MARKET" ]; then
-            echo "::error::plugin.json is $PLUGIN but marketplace.json is $MARKET"
+          if [ "$PLUGIN" != "$MARKET" ] || [ "$PLUGIN" != "$PORTABLE" ]; then
+            echo "::error::.cursor-plugin/plugin.json is $PLUGIN, plugin.json is $PORTABLE, marketplace.json is $MARKET"
             exit 1
           fi
           if ! printf '%s' "$PLUGIN" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- Made the plugin an [Agent Plugins 1.0](https://github.com/agentplugins/agent-plugins-spec) package so Codex, GitHub Copilot, and other conformant clients can load it: added a portable `plugin.json` next to `.cursor-plugin/plugin.json`, and added `$schema` and `type` to `mcp.json`.
+- Re-vendored `coder/skills` at `3c99837`: the `workspaces` skill is now named `workspaces`, matching its directory, as the Agent Skills spec requires. It was `coder-workspaces`.
+- `scripts/validate-template.mjs` now checks `plugin.json`, `mcp.json`, skill names, and that both manifests agree. CI also requires all three versions to match.
+- The `coder` MCP server and `/coder-agent` still work only in Cursor: the URL uses the `${CODER_URL}` plugin variable, which Agent Plugins does not allow in `url`.
+
 ## 0.2.0
 
 - Added the Coder remote MCP server (`mcp.json`) and the `/coder-agent` command for delegating tasks to Coder Agents chats. Requires Coder v2.38 or later, with the `mcp-server-http` experiment and `CODER_OAUTH2_PROVIDER_ENABLE=true`.
