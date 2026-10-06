@@ -7,7 +7,9 @@
 plugins/coder/                    The Coder plugin
   .cursor-plugin/plugin.json      Plugin manifest (canonical version)
   CHANGELOG.md                    Release history
+  mcp.json                        Coder remote MCP server (used by /coder-agent)
   skills/                         vendored coder/skills (workspaces, setup, templates, modules)
+  commands/                       /coder-agent
   assets/logo.svg
 scripts/validate-template.mjs     Manifest and frontmatter validation
 .github/scripts/sync-skills.mjs   Re-vendor skills from coder/skills
