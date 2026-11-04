@@ -15,6 +15,8 @@ workspaces, templates, and Coder Agents.
 | **Skill** | `modules` | Add or update modules from [registry.coder.com](https://registry.coder.com/modules) in an existing template, such as IDEs, AI agents, and dotfiles. |
 | **MCP** | Coder MCP server | Remote MCP server at `${CODER_URL}/api/experimental/mcp/http`, authenticated with OAuth2. Gives the agent Coder's own tools for workspaces, templates, files, logs, and Coder Agents chats. Required by `/coder-agent`; the skills work without it. |
 | **Command** | `/coder-agent` | Delegate a task to a Coder Agent on your deployment and supervise it: create the chat, relay questions, and report the outcome. Requires the MCP server. |
+| **Rule** | `coder-templates` | Auto-attaches to `.tf` files and applies Coder template conventions when the file uses the `coder/coder` provider: parameters vs. variables, agent and lifecycle setup, pinned modules, and no secrets in code. |
+| **Subagent** | `coder-template-reviewer` | Read-only review of a Coder template before you push it. Runs `terraform fmt -check`, and `terraform validate` if the template is initialized, then reports findings by severity with `file:line` and a fix. |
 
 The `workspaces`, `setup`, `templates`, and `modules` skills are vendored
 from [coder/skills](https://github.com/coder/skills). See [VENDOR.md](VENDOR.md).
@@ -106,6 +108,7 @@ whatever session the `coder` CLI already has from `coder login`.
 | "Which templates can I use, and what parameters does `kubernetes` take?" | Uses the `templates` skill to inspect templates. |
 | "Add JetBrains Gateway to my Docker template." | Uses the `modules` skill to add the registry module. |
 | "Set up Coder on this VM." | Uses the `setup` skill to install and bootstrap a deployment. |
+| "Review my template before I push it." | Runs the `coder-template-reviewer` subagent and reports findings without editing files. |
 | "Delegate this refactor to a Coder Agent and tell me when it's done." | Creates a Coder Agents chat with `coder_create_chat` and waits with `coder_await_chat`. |
 
 ## Self-hosted and air-gapped deployments

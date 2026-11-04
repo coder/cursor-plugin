@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+
+- Added the `coder-templates` rule, which auto-attaches to `.tf` files and applies Coder template conventions when the file uses the `coder/coder` provider.
+- Added the `coder-template-reviewer` subagent, a read-only reviewer that checks a template for build, lifecycle, parameter, module, and secret issues before it is pushed.
+
 ## 0.2.0
 
 - Added the Coder remote MCP server (`mcp.json`) and the `/coder-agent` command for delegating tasks to Coder Agents chats. Requires Coder v2.38 or later, with the `mcp-server-http` experiment and `CODER_OAUTH2_PROVIDER_ENABLE=true`.
