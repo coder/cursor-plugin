@@ -28,9 +28,10 @@ Then read every `.tf` file and check:
 
 1. **Providers**: `required_providers` declares `coder/coder` and the
    infrastructure provider, each with a version constraint.
-2. **Agent**: one `coder_agent` per machine, with `os` and `arch` set
-   and no deprecated `dir` argument. The compute resource runs the
-   agent's `init_script` and receives its `token`.
+2. **Agent**: one `coder_agent` per machine, with `os` and `arch` set.
+   The compute resource runs the agent's `init_script` and receives its
+   `token`. `dir` is optional and not deprecated (provider 2.20.0 removed
+   the deprecation), so do not flag it.
 3. **Lifecycle**: compute that should stop with the workspace uses
    `count = data.coder_workspace.me.start_count`. Persistent storage
    is outside that `count` and named from `data.coder_workspace.me.id`,

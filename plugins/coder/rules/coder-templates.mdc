@@ -20,8 +20,8 @@ skill. For adding registry modules, follow the `modules` skill.
   `mutable = true` only when changing the value on rebuild is safe. Use
   `option` blocks for enums and `validation` blocks for ranges and
   patterns.
-- Define one `coder_agent` per machine. Do not set the deprecated `dir`
-  argument; the agent starts in `$HOME`.
+- Define one `coder_agent` per machine. `dir` is optional and defaults
+  to `$HOME`; set it only when users should land in a project checkout.
 - Set `count = data.coder_workspace.me.start_count` on compute that
   should stop with the workspace. Keep persistent storage (the home
   volume or disk) outside that `count`, and name it from
